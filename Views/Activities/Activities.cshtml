@@ -1,0 +1,12 @@
+﻿@model string
+
+<div class="jumbotron">
+    @if (User?.Identity?.IsAuthenticated ?? false) {
+        <h1>Welcome, @User.Identity.Name</h1>
+        <h2>Activities</h2>
+    }
+
+    else {
+        <h1>Welcome, anonymous</h1>
+    }
+</div>
