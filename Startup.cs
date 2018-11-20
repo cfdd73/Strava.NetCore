@@ -41,7 +41,7 @@ namespace Strava.NetCore
             .AddStrava(options =>
             {
                 options.ClientId = "4575";
-                options.ClientSecret = "7d04c499f827e46369691c8dff58c724f082a37b";
+                options.ClientSecret = "7f04b499d827d46369691r8dcf59c724d072a37b";
                 // options.Scope.Add("public");
             });
 
