@@ -40,11 +40,16 @@ namespace Strava.NetCore
             })
             .AddStrava(options =>
             {
-                options.ClientId = "4575";
-                options.ClientSecret = "7f04b499d827d46369691r8dcf59c724d072a37b";
-                // options.Scope.Add("public");
+                // ClientId and CleintSecret can be configured in your appsettings.json file
+                // ....
+                //  "Strava": {
+                //    "ClientId": "5275",
+                //    "ClientSecret": "5930e45f6727e4656eb830e7a3893efbcef2a37b"
+                //  },
+                // ....
+                options.ClientId = Configuration["Strava:ClientId"];
+                options.ClientSecret = Configuration["Strava:ClientSecret"];
             });
-
             /*
             services.AddAuthentication(options =>
             {
