@@ -1,10 +1,11 @@
-﻿@model string
+﻿@model string[]
 
 <div class="jumbotron">
     @if (User?.Identity?.IsAuthenticated ?? false) {
         <h1>Welcome, @User.Identity.Name</h1>
         <h2>Activities</h2>
-        @Html.Raw(Model);
+        @Html.Raw(Model[0]);
+        @Html.Raw(Model[1]);
         <p>Model:</p>
         @Model
         <p>-------</p>

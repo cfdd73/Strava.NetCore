@@ -10,7 +10,17 @@ namespace Mvc.Client.Controllers
 {
     public class ActivitiesController : Controller
     {
-        [HttpGet("~/activities")]
-        public ActionResult Activities() => View();
+        [HttpGet("~/activities0")]
+        public ActionResult Activities0() => View();
+
+        [HttpGet("~/activities"), HttpPost("~/activities")]
+        public ActionResult Activities()
+        {
+            var model=new string[]{"ABCD","EFGH"};
+            // Instruct the cookies middleware to delete the local cookie created
+            // when the user agent is redirected from the external identity provider
+            // after a successful authentication flow (e.g Google or Facebook).
+            return View(model);
+        }
     }
 }
