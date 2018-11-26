@@ -4,6 +4,19 @@
     @if (User?.Identity?.IsAuthenticated ?? false) {
         <h1>Welcome, @User.Identity.Name</h1>
         <h2>Activities</h2>
+        @Html.Raw(Model);
+        <p>Model:</p>
+        @Model
+        <p>-------</p>
+        <br>@User
+        <br>@User.Identity
+        <br>@User.Identity.AuthenticationType
+        <br>@User.Identity.IsAuthenticated
+        <p>
+            @foreach (var claim in Context.User.Claims) {
+                <div>@claim.Type: <b>@claim.Value</b></div>
+            }
+        </p>
     }
 
     else {
