@@ -1,6 +1,14 @@
 ﻿@model string[]
 
 <div class="jumbotron">
+    AccessToken
+    @{
+        Console.WriteLine($"Session {Context.User}");
+        Console.WriteLine($"HttpHeader {string.Join(", ", Context.Request.Headers.Keys)}");
+        
+        // @Html.Raw(User?.AccessToken);
+    }
+
     @if (User?.Identity?.IsAuthenticated ?? false) {
         <h1>Welcome, @User.Identity.Name</h1>
         <h2>Activities</h2>
