@@ -1,19 +1,21 @@
-﻿@model string[]
+﻿@using System.Linq;
+@model Mvc.Client.Models.ActivitiesModel;
 
+@{
+    ViewBag.Title = "Activities";
+}
 <div class="jumbotron">
     AccessToken
     @{
         Console.WriteLine($"Session {Context.User}");
         Console.WriteLine($"HttpHeader {string.Join(", ", Context.Request.Headers.Keys)}");
-        
-        // @Html.Raw(User?.AccessToken);
-    }
+    }    
+    @Html.Raw("Token="+Context.User.Claims.First(claim=>claim.Type=="token")+"<BR>")
 
     @if (User?.Identity?.IsAuthenticated ?? false) {
         <h1>Welcome, @User.Identity.Name</h1>
         <h2>Activities</h2>
-        @Html.Raw(Model[0]);
-        @Html.Raw(Model[1]);
+        @Html.Raw("Token="+Model.Token+"<BR>");
         <p>Model:</p>
         @Model
         <p>-------</p>

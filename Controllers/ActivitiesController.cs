@@ -13,6 +13,8 @@ using Strava.Athletes;
 using Strava.Authentication;
 using Strava.Clients;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using Mvc.Client.Models;
 
 namespace Mvc.Client.Controllers
 {
@@ -26,10 +28,16 @@ namespace Mvc.Client.Controllers
         [HttpGet("~/activities"), HttpPost("~/activities")]
         public ActionResult Activities()
         {
-            var model=new string[]{"ABCD","EFGH"};
+            // var model=new string[]{"ABCD","EFGH"};
+            ActivitiesModel model = new ActivitiesModel();
             Console.WriteLine($"HttpContext.User.Identity.Name={HttpContext.User.Identity.Name}");
-            // Console.WriteLine($"HttpContext.Session={HttpContext.Session.}");
+            var token = User.Claims.First(claim=>claim.Type=="token").Value;
+            Console.WriteLine($"token={token}");
+            model.Token=token;
             // StravaClient client = new StravaClient(User);
+            WebAuthentication wa = new WebAuthentication();
+            wa.AccessToken=token;
+            Task t = GetActivityListAsync(wa);
             return View(model);
         }
         public static async Task GetActivityListAsync(WebAuthentication wa)
