@@ -30,28 +30,21 @@ namespace Mvc.Client.Controllers
         {
             // var model=new string[]{"ABCD","EFGH"};
             ActivitiesModel model = new ActivitiesModel();
-            Console.WriteLine($"HttpContext.User.Identity.Name={HttpContext.User.Identity.Name}");
             var token = User.Claims.First(claim=>claim.Type=="token").Value;
-            Console.WriteLine($"token={token}");
             model.Token=token;
-            // StravaClient client = new StravaClient(User);
             WebAuthentication wa = new WebAuthentication();
             wa.AccessToken=token;
-            Task t = GetActivityListAsync(wa);
+            Task<IEnumerable<ActivitySummary>> t = GetActivityListAsync(wa);
+
+
+            IEnumerable<ActivitySummary> activities = t.Result;
+            model.Activities=activities;
             return View(model);
         }
-        public static async Task GetActivityListAsync(WebAuthentication wa)
+        
+        private async Task<IEnumerable<ActivitySummary>> GetActivityListAsync(WebAuthentication wa)
         {
-
-            StravaClient client = new StravaClient(wa);
-            // Receive the currently authenticated athlete
-            List<ActivitySummary> activities = await client.Activities.GetActivitiesAsync(20, 20);
-            // IAuthenticationService authentication  = DependencyResolver.Current.GetService<IAuthenticationService>()
-
-            foreach (ActivitySummary Activity in activities)
-            {
-                Console.WriteLine($"Email:{Activity.Name} {Activity.Type}");
-            }
+            return await new StravaClient(wa).Activities.GetActivitiesAsync(40, 40);
         }
     }
 }

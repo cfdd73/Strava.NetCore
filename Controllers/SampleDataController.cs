@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Strava.Activities;
+using Strava.Authentication;
+using Strava.Clients;
 
 namespace Strava.NetCore.Controllers
 {
@@ -24,6 +27,15 @@ namespace Strava.NetCore.Controllers
                 TemperatureC = rng.Next(-20, 55),
                 Summary = Summaries[rng.Next(Summaries.Length)]
             });
+        }
+
+        [HttpGet("[action]")]
+        public IEnumerable<ActivitySummary> GetActivities()
+        {
+            WebAuthentication wa = new WebAuthentication();
+            wa.AccessToken=User.Claims.First(claim=>claim.Type=="token").Value;
+            var activities = new StravaClient(wa).Activities.GetActivitiesAsync(40, 40).Result;
+            return activities;
         }
 
         public class WeatherForecast
