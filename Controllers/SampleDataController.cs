@@ -1,4 +1,7 @@
 using System;
+using System.Net.Http;
+using System.Web.Http;
+using System.Net;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,10 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 using Strava.Activities;
 using Strava.Authentication;
 using Strava.Clients;
+using Newtonsoft.Json;
 
 namespace Strava.NetCore.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class SampleDataController : Controller
     {
         private static string[] Summaries = new[]
@@ -30,11 +35,15 @@ namespace Strava.NetCore.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<ActivitySummary> GetActivities()
+        public ActionResult<IEnumerable<ActivitySummary>> GetActivities()
         {
             WebAuthentication wa = new WebAuthentication();
-            wa.AccessToken=User.Claims.First(claim=>claim.Type=="token").Value;
+            wa.AccessToken = User.Claims.First(claim => claim.Type == "token").Value;
             var activities = new StravaClient(wa).Activities.GetActivitiesAsync(40, 40).Result;
+            if (activities == null)
+            {
+                return NotFound();
+            }
             return activities;
         }
 

@@ -42,6 +42,19 @@ namespace Mvc.Client.Controllers
             return View(model);
         }
         
+        [HttpGet("~/api/[controller]/[action]")]
+        public ActionResult<IEnumerable<ActivitySummary>> GetActivities()
+        {
+            WebAuthentication wa = new WebAuthentication();
+            wa.AccessToken = User.Claims.First(claim => claim.Type == "token").Value;
+            var activities = new StravaClient(wa).Activities.GetActivitiesAsync(40, 40).Result;
+            if (activities == null)
+            {
+                return NotFound();
+            }
+            return activities;
+        }
+
         private async Task<IEnumerable<ActivitySummary>> GetActivityListAsync(WebAuthentication wa)
         {
             return await new StravaClient(wa).Activities.GetActivitiesAsync(40, 40);

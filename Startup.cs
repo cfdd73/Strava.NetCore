@@ -50,31 +50,6 @@ namespace Strava.NetCore
                 options.ClientId = Configuration["Strava:ClientId"];
                 options.ClientSecret = Configuration["Strava:ClientSecret"];
             });
-            /*
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "oauth";
-            })
-            .AddCookie()
-            .AddOAuth("oauth", options =>
-            {
-                options.ClientId = Configuration["ClientId"];
-                options.ClientSecret = Configuration["ClientSecret"];
-                options.CallbackPath = new PathString(Configuration["CallbackPage"]);
-
-                options.AuthorizationEndpoint = Configuration["AuthorizationEndpoint"];
-                options.TokenEndpoint = Configuration["TokenEndpoint"];
-                options.UserInformationEndpoint = Configuration["UserInformationEndpoint"];
-            });
-            */
-            /*
-            services.AddAuthentication().
-            AddOAuth(
-                "strava",
-                options=> AuthenticationMiddleware.SetOAuth2Options(options)
-            );
-            */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -92,7 +67,7 @@ namespace Strava.NetCore
 
             app.UseHttpsRedirection();
 
-            if (true)
+            if (false)
             {
                 app.UseStaticFiles();
                 app.UseAuthentication();
@@ -102,6 +77,7 @@ namespace Strava.NetCore
             {
                 app.UseStaticFiles();
                 app.UseSpaStaticFiles();
+                app.UseAuthentication();
                 app.UseMvc(routes =>
                 {
                     routes.MapRoute(
