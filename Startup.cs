@@ -7,6 +7,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+// Imports the Google Cloud KMS client library
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
+using Google.Apis.CloudKMS.v1;
+using Google.Apis.CloudKMS.v1.Data;
+using System;
 
 namespace Strava.NetCore
 {
@@ -47,9 +53,56 @@ namespace Strava.NetCore
                 //    "ClientSecret": "5930e45f6727e4656eb830e7a3893efbcef2a37b"
                 //  },
                 // ....
-                options.ClientId = Configuration["Strava:ClientId"];
-                options.ClientSecret = Configuration["Strava:ClientSecret"];
+                // Your Google Cloud Platform project ID.
+                string projectId = "jenkins-x-002";
+
+                // Lists keys in the "global" location.
+                string location = "global";
+
+                // The resource name of the location associated with the key rings.
+                string parent = $"projects/{projectId}/locations/{location}";
+
+                // Authorize the client using Application Default Credentials.
+                // See: https://developers.google.com/identity/protocols/application-default-credentials
+                GoogleCredential credential = GoogleCredential.GetApplicationDefaultAsync().Result;
+                // Specify the Cloud Key Management Service scope.
+                if (credential.IsCreateScopedRequired)
+                {
+                    credential = credential.CreateScoped(new[]
+                    {
+                    Google.Apis.CloudKMS.v1.CloudKMSService.Scope.CloudPlatform
+                });
+                }
+                // Instantiate the Cloud Key Management Service API.
+                CloudKMSService cloudKms = new CloudKMSService(new BaseClientService.Initializer
+                {
+                    HttpClientInitializer = credential,
+                    GZipEnabled = false
+                });
+                string keyRingId = "oauth_keystore";
+                string cryptoKeyId = "strava_client_secret";
+
+                var ClientIdEnc = Configuration["Strava:ClientId"];
+                options.ClientId = Decrypt(cloudKms, projectId, location, keyRingId, cryptoKeyId, ClientIdEnc);
+
+                var ClientSecretEnc = Configuration["Strava:ClientSecret"];
+                options.ClientSecret = Decrypt(cloudKms, projectId, location, keyRingId, cryptoKeyId, ClientSecretEnc);
             });
+        }
+
+        public static string Decrypt(CloudKMSService cloudKms, string projectId, string locationId, string keyRingId, string cryptoKeyId, string ciphertext)
+        {
+            //var cloudKms = CreateAuthorizedClient();
+            // Generate the full path of the crypto key to use for encryption.
+            var cryptoKey = $"projects/{projectId}/locations/{locationId}/keyRings/{keyRingId}/cryptoKeys/{cryptoKeyId}";
+            DecryptRequest decryptRequest = new DecryptRequest();
+            decryptRequest.Ciphertext = ciphertext;
+            Console.WriteLine($"dataToDecrypt.Ciphertext: {decryptRequest.Ciphertext}");
+            var result = cloudKms.Projects.Locations.KeyRings.CryptoKeys.Decrypt(name: cryptoKey, body: decryptRequest).Execute();
+            // Output decrypted data to a file.
+            var plaintext = result.Plaintext;
+            Console.WriteLine($"Decrypted file created: {plaintext}");
+            return plaintext;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
